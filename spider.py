@@ -1,5 +1,6 @@
 # -*- coding = utf-8 -*-
 import code
+from turtle import title
 from urllib import response
 from wsgiref.util import request_uri
 from bs4 import BeautifulSoup       ##网页解析，获取数据指定
@@ -20,12 +21,19 @@ def main():    # 1.爬取网页 2.逐一解析数据 3.保存数据
 
 findLink = re.compile(r'<a href="(.*)">')
 findTitle = re.compile(r'<span class="title">(.*)</span>')
-findImgSrc = re.compile(r'<img.*src="(.*?)"',re.S) # 后面re.S表示忽略re.S
+findImgSrc = re.compile(r'<img.*src="(.*?)" width="100"/>',re.S) # 后面re.S表示忽略换行符
+findRating = re.compile(r'<span class="rating_num" property="v:average">(.*)</span>')
+#找到评价人数
+findJudge = re.compile(r'<span>(\d*)人评价</span>')
+#找到概况
+findInq = re.compile(r'<span class="inq">(.*)</span>')
+#相关内容
+findBd = re.compile(r'<p class="">(.*?)</p>',re.S)
 
 
 def getData(baseurl): #爬取网页
     datalist = []
-    for i in range(0,1):
+    for i in range(0,10):
         url = baseurl + str(i*25)
         html = askURL(url)          #保存获取到的页码
 
@@ -35,9 +43,35 @@ def getData(baseurl): #爬取网页
             data =[] #一部电影的全部信息
             item = str(item)
             link = re.findall(findLink,item)[0]  #re库迎来通过正则表达式查找指定的字符串
-            title = re.findall(findTitle,item)[0]
-            print(title)
-
+            data.append(link)
+            titles = re.findall(findTitle,item) 
+            if len(titles) == 2 :
+                ctitle = titles[0]
+                data.append(ctitle)
+                otitle = titles[1].replace("/","")
+                data.append(otitle)
+            else : 
+                data.append(titles[0])
+                data.append(' ')
+            img = re.findall(findImgSrc,item)[0] #去掉无关的符号
+            data.append(img)
+            rating = re.findall(findRating,item)[0] 
+            data.append(rating)
+            judgeNum = re.findall(findJudge,item)[0]
+            data.append(judgeNum)
+            inq = re.findall(findInq,item)
+            if len(inq) != 0:
+                inq = inq[0].replace("。","")
+                data.append(inq)
+            else: 
+                data.append(" ")
+            bd = re.findall(findBd,item)[0]
+            bd = re.sub('<br(\s+)?>(\s+)'," ",bd)
+            bd = re.sub('/'," ",bd)
+            data.append(bd.strip()) #去掉前后的空格
+            #把处理好的电影信息放进datalist 
+            datalist.append(data)
+    
     # 解析数据
     return datalist
 
