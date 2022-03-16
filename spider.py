@@ -14,7 +14,7 @@ def main():    # 1.爬取网页 2.逐一解析数据 3.保存数据
 
     baserurl = "https://movie.douban.com/top250?start="
     datalist =  getData(baserurl)
-    savepath = r".\\豆瓣电影top250.xls"
+    savepath = "豆瓣电影top250.xls"
     #3. 保存数据
 #    saveData(savepath)
 
@@ -71,7 +71,7 @@ def getData(baseurl): #爬取网页
             data.append(bd.strip()) #去掉前后的空格
             #把处理好的电影信息放进datalist 
             datalist.append(data)
-    
+    print(datalist)
     # 解析数据
     return datalist
 
@@ -94,8 +94,7 @@ def askURL(url):
     return html 
 
 def saveData(savepath):
-    print("hello")
-
+    book = xlwt.Workbook(encoding="utf-8",style_compression=0)
 
 
 
